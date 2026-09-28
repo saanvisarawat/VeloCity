@@ -6,6 +6,9 @@ import asyncpg
 import os
 import json
 
+from fastapi import File, UploadFile, Form, Depends
+from services.ml_bridge import process_video_via_ml
+
 from services.analytics_engine import (
     compute_density, compute_od_matrix, compute_heatmap,
     compute_cameras, compute_summary, compute_bottlenecks,
@@ -182,10 +185,10 @@ async def get_heatmap(time_bucket: str = None):
         await conn.close()
 
 @app.get("/api/v1/analytics/bottlenecks")
-async def get_bottlenecks(window_minutes: int = 60):
+async def get_bottlenecks(window_minutes: int = 60, threshold_factor: float = 1.5):
     conn = await asyncpg.connect(DB_URL)
     try:
-        return await compute_bottlenecks(conn, window_minutes)
+        return await compute_bottlenecks(conn, window_minutes, threshold_factor)
     finally:
         await conn.close()
 
@@ -314,6 +317,38 @@ async def add_blacklist(entry: BlacklistEntry):
     finally:
         await conn.close()
 
+@app.post("/api/v1/upload-video")
+async def upload_traffic_video(
+    video: UploadFile = File(...),
+    camera_id: str = Form("demo01")
+    # Line 314 removed: 'conn = Depends(get_db)' is deleted to fix the Pylance error
+):
+    # 1. Run video through the remote ML model
+    extracted_reads = await process_video_via_ml(video, camera_id)
+    
+    # 2. Ingest reads into PostGIS & trigger alerts
+    ingested_count = 0
+    for read in extracted_reads:
+        # Re-use the existing ReadIngest model (line 61) and ingest_read function (line 71)
+        read_obj = ReadIngest(
+            camera_id=read["camera_id"],
+            track_id=read["track_id"],
+            plate_text=read["plate_text"],
+            confidence=read["confidence"],
+            frame_ts=read["frame_ts"],
+            image_ref=read["image_ref"]
+        )
+        # This replaces evaluate_alerts and handles DB connections, deduplication, and WebSocket broadcasts automatically
+        await ingest_read(read_obj) 
+        ingested_count += 1
+        
+    return {
+        "status": "success",
+        "camera_id": camera_id,
+        "processed_reads": ingested_count, 
+        "data": extracted_reads
+    }
+
 @app.delete("/api/v1/blacklist/{plate}")
 async def delete_blacklist(plate: str):
     conn = await asyncpg.connect(DB_URL)
@@ -325,3 +360,5 @@ async def delete_blacklist(plate: str):
         return {"status": "removed", "plate": plate}
     finally:
         await conn.close()
+
+        

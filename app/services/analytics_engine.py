@@ -165,11 +165,11 @@ async def compute_summary(conn):
         "cameras_total": camera_counts['total'] or 0,
     }
 
-async def compute_bottlenecks(conn, window_minutes: int = 60):
+async def compute_bottlenecks(conn, window_minutes: int = 60, threshold_factor: float = 1.5):
     """
     Compares live camera-to-camera transit times against the seeded historical
     baseline (analytics_cache, metric_type='BOTTLENECK_BASELINE') for the
-    current hour-of-day, and flags segments running slower than expected.
+    current hour-of-day, and flags segments running slower than expected by >= threshold_factor.
     """
     baseline_rows = await conn.fetch("""
         SELECT node_or_segment_id,
@@ -206,11 +206,13 @@ async def compute_bottlenecks(conn, window_minutes: int = 60):
         expected = baseline.get(r['segment'])
         if expected is None:
             continue
-        if r['current_sec'] > expected:
+        # Flag if current transit time exceeds baseline by >= threshold_factor (1.5x)
+        if r['current_sec'] >= (expected * threshold_factor):
             bottlenecks.append({
                 "segment": r['segment'],
                 "expected_sec": round(expected, 1),
-                "current_sec": round(r['current_sec'], 1)
+                "current_sec": round(r['current_sec'], 1),
+                "congestion_factor": round(r['current_sec'] / expected, 2)
             })
 
     bottlenecks.sort(key=lambda b: b['current_sec'] - b['expected_sec'], reverse=True)
