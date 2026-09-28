@@ -6,7 +6,7 @@ import HeroGraphic from '../components/HeroGraphic';
 
 const SUBHEADLINE = 'See It. Track It. Flag It.';
 const TAGLINE =
-  'A real-time ANPR traffic platform combining live density mapping, cross-camera vehicle trajectory reconstruction, and automated blacklist and anomaly alerting — one continuously updating picture of the city.';
+  'A real-time ANPR traffic intelligence platform that unifies live density mapping, cross-camera vehicle trajectory reconstruction, and automated blacklist alerting into a single, continuously updating view of the city.';
 
 const HERO_CAPABILITIES = [
   { to: '/dashboard', label: 'Live Density Heatmap' },
