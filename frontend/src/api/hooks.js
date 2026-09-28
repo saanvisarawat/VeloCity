@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { api } from './client';
 
 // -------------------------
@@ -49,6 +49,36 @@ export function useHeatmap() {
     queryKey: ['heatmap'],
     queryFn: () => api.get('/api/v1/analytics/heatmap'),
     refetchInterval: 30000,
+  });
+}
+
+// City-wide live road congestion (backend caches ~15 min to respect the feed's daily quota, so polling
+// every couple of minutes is cheap). Separate from useHeatmap, which is our own camera detections.
+export function useLiveTraffic() {
+  return useQuery({
+    queryKey: ['live-traffic'],
+    queryFn: () => api.get('/api/v1/analytics/live-traffic'),
+    refetchInterval: 120000,
+  });
+}
+
+// Live points averaged over the selected Time Range from the recorded snapshots (falls back to the
+// current reading until history accumulates). keepPreviousData avoids a blank map while switching ranges.
+export function useLiveTrafficWindow(minutes) {
+  return useQuery({
+    queryKey: ['live-traffic-window', minutes],
+    queryFn: () => api.get(`/api/v1/analytics/live-traffic/window?minutes=${minutes}`),
+    refetchInterval: 120000,
+    placeholderData: keepPreviousData,
+  });
+}
+
+// Recorded city-wide snapshots of the live feed (one every ~20 min), for the trend chart.
+export function useLiveTrafficHistory(hours) {
+  return useQuery({
+    queryKey: ['live-traffic-history', hours],
+    queryFn: () => api.get(`/api/v1/analytics/live-traffic/history?hours=${hours}`),
+    refetchInterval: 120000,
   });
 }
 

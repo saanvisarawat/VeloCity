@@ -6,6 +6,7 @@ const TABS = [
   { to: '/dashboard', label: 'Dashboard' },
   { to: '/trajectory', label: 'Trajectory' },
   { to: '/alerts', label: 'Alerts' },
+  { to: '/test', label: 'Test Model' },
 ];
 
 export default function NavBar({ live, alertPulseKey }) {

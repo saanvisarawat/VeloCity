@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { MapContainer, TileLayer, CircleMarker, Popup, Polyline, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, CircleMarker, Pane, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.heat';
@@ -21,7 +21,9 @@ import {
   useOdMatrix,
   useBottlenecks,
   useHeatmap,
-  useTimeseries,
+  useLiveTraffic,
+  useLiveTrafficHistory,
+  useLiveTrafficWindow,
   useCameraRecentReads,
   useDelhiVehicleStats,
   useDelhiVehicleFleetTrend,
@@ -29,6 +31,7 @@ import {
 import { KpiSkeleton, SkeletonBlock } from '../components/Skeleton';
 import { EmptyState, ErrorState, StatePanel } from '../components/StatePanel';
 import { arcPoints } from '../utils/geo';
+import { API_BASE } from '../api/client';
 
 const TIME_RANGE_MINUTES = {
   'Last 30 minutes': 30,
@@ -45,21 +48,51 @@ const DARK_TILE_URL =
   'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
 const DARK_TILE_ATTRIBUTION = '&copy; Esri, HERE, Garmin, &copy; OpenStreetMap contributors';
 
-function HeatLayer({ points }) {
+const CAMERA_HEAT_GRADIENT = {
+  0.0: 'rgba(57,255,20,0)',
+  0.3: 'rgba(57,255,20,0.35)',
+  0.6: 'rgba(57,255,20,0.65)',
+  1.0: '#39ff14',
+};
+// Congestion scale for the live layer: free-flowing green through amber to red.
+const LIVE_HEAT_GRADIENT = {
+  0.0: 'rgba(57,255,20,0)',
+  0.25: 'rgba(57,255,20,0.55)',
+  0.5: '#e6eb14',
+  0.75: '#ff8c00',
+  1.0: '#ff2d2d',
+};
+
+function HeatLayer({ points, gradient = CAMERA_HEAT_GRADIENT, radius = 38, blur = 28, max = 1.0, maxZoom = 15 }) {
   const map = useMap();
 
   useEffect(() => {
     if (!points.length) return undefined;
-    const heat = L.heatLayer(points, {
-      radius: 38,
-      blur: 28,
-      maxZoom: 15,
-      gradient: { 0.0: 'rgba(57,255,20,0)', 0.3: 'rgba(57,255,20,0.35)', 0.6: 'rgba(57,255,20,0.65)', 1.0: '#39ff14' },
-    }).addTo(map);
+    const heat = L.heatLayer(points, { radius, blur, maxZoom, gradient, max }).addTo(map);
     return () => map.removeLayer(heat);
-  }, [map, points]);
+  }, [map, points, gradient, radius, blur, max, maxZoom]);
 
   return null;
+}
+
+// Data credit for the live-traffic feed, shown in the map's attribution strip whenever any of its
+// layers (heat, road colours, point markers) are on the map.
+function LiveDataAttribution({ active }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!active) return undefined;
+    const text = `&copy; 1992 - ${new Date().getFullYear()} TomTom`;
+    map.attributionControl.addAttribution(text);
+    return () => map.attributionControl.removeAttribution(text);
+  }, [map, active]);
+  return null;
+}
+
+function congestionColor(congestion) {
+  if (congestion >= 0.45) return '#ff2d2d';
+  if (congestion >= 0.3) return '#ff8c00';
+  if (congestion >= 0.15) return '#e6eb14';
+  return '#39ff14';
 }
 
 function statusDotColor(status) {
@@ -79,7 +112,7 @@ function densityOpacity(level) {
 }
 
 function formatDelta(today, yesterday) {
-  if (!yesterday) return { text: 'no prior-day data', neutral: true };
+  if (!yesterday || yesterday < 10) return { text: 'not enough prior-day data', neutral: true };
   const pct = ((today - yesterday) / yesterday) * 100;
   const sign = pct >= 0 ? '+' : '';
   return { text: `${sign}${pct.toFixed(1)}% vs yesterday`, neutral: false };
@@ -100,45 +133,47 @@ function ChartTooltip({ active, payload, label }) {
 }
 
 function TrendChart({ windowMinutes }) {
-  const bucketMinutes = windowMinutes <= 60 ? 5 : windowMinutes <= 360 ? 15 : 60;
-  const timeseriesQuery = useTimeseries(windowMinutes, bucketMinutes);
+  // Snapshots are recorded every ~20 minutes, so short windows would hold 1-2 points; always show at least 6h.
+  const hours = Math.max(6, Math.ceil(windowMinutes / 60));
+  const historyQuery = useLiveTrafficHistory(hours);
+  const points = historyQuery.data || [];
 
   return (
     <section className="glass-card map-card chart-card">
       <div className="section-heading">
         <div>
           <h2>Traffic Trend</h2>
-          <p>Vehicle count and average speed, bucketed over the selected time range</p>
+          <p>City-wide average speed and congestion from the live traffic feed, recorded every 20 minutes</p>
         </div>
         <div className="chart-legend">
           <span className="chart-legend-item">
             <span className="chart-legend-swatch" style={{ background: '#39ff14' }} />
-            Vehicle count
+            Avg speed (km/h)
           </span>
           <span className="chart-legend-item">
-            <span className="chart-legend-swatch" style={{ background: 'rgba(57,255,20,0.4)' }} />
-            Avg speed (km/h)
+            <span className="chart-legend-swatch" style={{ background: '#ff8c00' }} />
+            Congestion (%)
           </span>
         </div>
       </div>
 
-      {timeseriesQuery.isLoading && <SkeletonBlock height={220} />}
-      {timeseriesQuery.isError && (
-        <ErrorState message="Could not load trend data" onRetry={() => timeseriesQuery.refetch()} />
+      {historyQuery.isLoading && <SkeletonBlock height={220} />}
+      {historyQuery.isError && (
+        <ErrorState message="Could not load trend data" onRetry={() => historyQuery.refetch()} />
       )}
-      {timeseriesQuery.data && timeseriesQuery.data.every((d) => d.vehicle_count === 0) && (
+      {historyQuery.data && points.length < 2 && (
         <EmptyState
           variant="empty"
-          title="No traffic recorded in this window"
-          message="Vehicle and speed trends will appear once reads come in."
+          title="Recording live traffic"
+          message="A new point is saved every 20 minutes, so the trend fills in as time passes."
         />
       )}
-      {timeseriesQuery.data && timeseriesQuery.data.some((d) => d.vehicle_count > 0) && (
+      {points.length >= 2 && (
         <ResponsiveContainer width="100%" height={220}>
-          <ComposedChart data={timeseriesQuery.data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+          <ComposedChart data={points} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
             <CartesianGrid stroke="rgba(57,255,20,0.08)" vertical={false} />
             <XAxis
-              dataKey="bucket"
+              dataKey="ts"
               tickFormatter={(v) => new Date(v).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               stroke="var(--text-faint)"
               fontSize={11}
@@ -156,24 +191,22 @@ function TrendChart({ windowMinutes }) {
             />
             <Tooltip content={<ChartTooltip />} />
             <Area
-              yAxisId="left"
+              yAxisId="right"
               type="monotone"
-              dataKey="vehicle_count"
-              name="Vehicle count"
-              stroke="#39ff14"
-              fill="rgba(57,255,20,0.15)"
+              dataKey="congestion_pct"
+              name="Congestion (%)"
+              stroke="#ff8c00"
+              fill="rgba(255,140,0,0.15)"
               strokeWidth={2}
             />
             <Line
-              yAxisId="right"
+              yAxisId="left"
               type="monotone"
               dataKey="avg_speed_kmh"
               name="Avg speed (km/h)"
-              stroke="rgba(234,255,240,0.6)"
-              strokeWidth={1.5}
-              dot={false}
-              strokeDasharray="4 4"
-              connectNulls
+              stroke="#39ff14"
+              strokeWidth={2}
+              dot={{ r: 3 }}
             />
           </ComposedChart>
         </ResponsiveContainer>
@@ -415,6 +448,11 @@ export default function Dashboard() {
   const odQuery = useOdMatrix();
   const bottlenecksQuery = useBottlenecks();
   const heatmapQuery = useHeatmap();
+  const liveTrafficQuery = useLiveTraffic();
+  const liveWindowQuery = useLiveTrafficWindow(windowMinutes);
+  const [showLiveHeat, setShowLiveHeat] = useState(true);
+  const [showRoads, setShowRoads] = useState(false);
+  const [showCameraHeat, setShowCameraHeat] = useState(false);
 
   const densityByCameraId = useMemo(() => {
     const map = new Map();
@@ -456,6 +494,16 @@ export default function Dashboard() {
     ]);
   }, [heatmapQuery.data]);
 
+  const live = liveTrafficQuery.data;
+  const liveAvailable = !!live?.available;
+  const liveCity = liveAvailable ? live.city : null;
+  const liveWin = liveWindowQuery.data;
+  const liveWinAvailable = !!liveWin?.available;
+  const livePoints = useMemo(
+    () => (liveWin?.points || []).map((p) => [p.lat, p.lon, p.intensity]),
+    [liveWin],
+  );
+
   const odArcs = useMemo(() => {
     if (!camerasQuery.data || !odQuery.data) return [];
     const maxTrips = Math.max(...odQuery.data.map((o) => o.trip_count), 1);
@@ -489,7 +537,7 @@ export default function Dashboard() {
       <header className="page-header">
         <div>
           <h1>City Traffic Analytics</h1>
-          <p>Real-time city-wide monitoring, sourced live from the ANPR ingestion pipeline</p>
+          <p>Live road traffic across the city, plus plate reads ingested from the ANPR pipeline</p>
         </div>
       </header>
 
@@ -515,9 +563,9 @@ export default function Dashboard() {
 
             <div className="glass-card kpi-card">
               <p className="kpi-label">Average City Speed</p>
-              <h2>{summary.avg_speed_kmh != null ? `${summary.avg_speed_kmh} km/h` : '—'}</h2>
+              <h2>{liveCity ? `${liveCity.avg_speed_kmh} km/h` : '—'}</h2>
               <span className="kpi-delta neutral">
-                {summary.avg_speed_kmh != null ? 'derived from live camera hops' : 'not enough data yet'}
+                {liveCity ? `live road feed · ${liveCity.point_count} points, free-flow ${liveCity.avg_free_flow_kmh} km/h` : 'live feed unavailable'}
               </span>
             </div>
 
@@ -548,7 +596,7 @@ export default function Dashboard() {
           <div className="section-heading">
             <div>
               <h2>Traffic Map</h2>
-              <p>Live density heatmap, camera markers, and origin-destination flows</p>
+              <p>Live traffic heatmap, camera markers, and origin-destination flows</p>
             </div>
           </div>
 
@@ -560,7 +608,41 @@ export default function Dashboard() {
             <MapContainer center={DEFAULT_CENTER} zoom={DEFAULT_ZOOM} scrollWheelZoom className="traffic-map">
               <TileLayer attribution={DARK_TILE_ATTRIBUTION} url={DARK_TILE_URL} />
 
-              <HeatLayer points={heatPoints} />
+              <LiveDataAttribution active={liveAvailable || liveWinAvailable} />
+              {liveAvailable && showRoads && (
+                // Own pane: the basemap's tile pane carries a hue-rotate tint (App.css) that would
+                // recolour these road colours, so the overlay sits above it, untinted.
+                <Pane name="live-roads" style={{ zIndex: 250 }}>
+                  <TileLayer url={`${API_BASE}/api/v1/analytics/live-traffic/tiles/{z}/{x}/{y}.png`} opacity={0.85} />
+                </Pane>
+              )}
+              {showCameraHeat && <HeatLayer points={heatPoints} />}
+              {liveWinAvailable && showLiveHeat && (
+                <HeatLayer points={livePoints} gradient={LIVE_HEAT_GRADIENT} radius={45} blur={35} max={0.9} maxZoom={DEFAULT_ZOOM} />
+              )}
+              {liveWinAvailable &&
+                liveWin.points.map((p) => (
+                  <CircleMarker
+                    key={p.name}
+                    center={[p.lat, p.lon]}
+                    radius={4}
+                    pathOptions={{ color: '#0a0d0a', weight: 1, fillColor: congestionColor(p.congestion), fillOpacity: 0.95 }}
+                  >
+                    <Popup>
+                      <strong>{p.name}</strong>
+                      <br />
+                      {p.current_speed_kmh} km/h {liveWin.snapshots > 1 ? `(avg, ${timeRange.toLowerCase()})` : 'now'} · {p.free_flow_speed_kmh} km/h free-flow
+                      <br />
+                      {Math.round(p.congestion * 100)}% slower than free-flow
+                      {p.road_closure && (
+                        <>
+                          <br />
+                          Closure reported nearby
+                        </>
+                      )}
+                    </Popup>
+                  </CircleMarker>
+                ))}
 
               {odArcs.map((arc) => (
                 <Polyline
@@ -605,6 +687,27 @@ export default function Dashboard() {
             </MapContainer>
           )}
 
+          <div className="live-legend">
+            {liveWinAvailable ? (
+              <>
+                <span className="live-legend-title">Live traffic</span>
+                <span>Free-flowing</span>
+                <span className="live-legend-bar" />
+                <span>Congested</span>
+                <span className="live-legend-time">
+                  {liveWin.snapshots > 1
+                    ? `average of ${liveWin.snapshots} snapshots · ${timeRange.toLowerCase()} · `
+                    : 'current reading · '}
+                  updated {new Date(liveWin.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </>
+            ) : (
+              <span className="live-legend-time">
+                {liveWindowQuery.isLoading ? 'Loading live traffic…' : 'Live traffic unavailable right now'}
+              </span>
+            )}
+          </div>
+
           {!camerasQuery.isLoading && !camerasQuery.isError && filteredCameras.length === 0 && (
             <EmptyState
               variant="empty-search"
@@ -647,6 +750,20 @@ export default function Dashboard() {
             <option>Medium</option>
             <option>High</option>
           </select>
+
+          <label className="field-label">Map Layers</label>
+          <label className="layer-toggle">
+            <input type="checkbox" checked={showLiveHeat} onChange={(e) => setShowLiveHeat(e.target.checked)} />
+            Live traffic heatmap
+          </label>
+          <label className="layer-toggle">
+            <input type="checkbox" checked={showRoads} onChange={(e) => setShowRoads(e.target.checked)} />
+            Live road colours
+          </label>
+          <label className="layer-toggle">
+            <input type="checkbox" checked={showCameraHeat} onChange={(e) => setShowCameraHeat(e.target.checked)} />
+            Camera detections
+          </label>
         </aside>
       </main>
 

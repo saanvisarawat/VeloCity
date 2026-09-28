@@ -9,6 +9,7 @@ import Landing from './screens/Landing';
 import Dashboard from './screens/Dashboard';
 import Trajectory from './screens/Trajectory';
 import Alerts from './screens/Alerts';
+import MLDemo from './screens/MLDemo';
 import { AlertSocketProvider, useAlertSocketContext } from './api/AlertSocketContext';
 
 const queryClient = new QueryClient({
@@ -49,6 +50,7 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/trajectory" element={<Trajectory />} />
               <Route path="/alerts" element={<Alerts />} />
+              <Route path="/test" element={<MLDemo />} />
             </Route>
           </Routes>
         </AlertSocketProvider>

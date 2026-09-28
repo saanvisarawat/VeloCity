@@ -239,6 +239,9 @@ export default function Landing() {
               <Link to="/trajectory" className="btn-pill btn-pill-outline">
                 ⌕ Search a Plate
               </Link>
+              <Link to="/test" className="btn-pill btn-pill-outline">
+                ▶ Test the Model
+              </Link>
             </div>
 
             <div className="hero-capability-row">

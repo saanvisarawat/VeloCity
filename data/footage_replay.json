@@ -1,0 +1,833 @@
+{
+ "note": "Real ANPR-pipeline output on recorded demo footage (frontend/public/demo/*_reads.json), one entry per voted track with a valid plate. Camera assignment is a demo mapping, not where the footage was shot.",
+ "clips": [
+  {
+   "camera_id": "CAM_01",
+   "source_video": "15238268_2160_3840_30fps.mp4",
+   "reads": [
+    {
+     "track_id": 1,
+     "plate_text": "CH01BL6800",
+     "confidence": 0.978,
+     "offset_s": 0.0
+    },
+    {
+     "track_id": 2,
+     "plate_text": "PB54H0997",
+     "confidence": 0.87,
+     "offset_s": 0.0
+    },
+    {
+     "track_id": 3,
+     "plate_text": "HR03R3003",
+     "confidence": 0.464,
+     "offset_s": 0.0
+    },
+    {
+     "track_id": 5,
+     "plate_text": "HR64A4034",
+     "confidence": 0.96,
+     "offset_s": 0.0
+    },
+    {
+     "track_id": 4,
+     "plate_text": "AS01BT0978",
+     "confidence": 0.526,
+     "offset_s": 0.1
+    },
+    {
+     "track_id": 25,
+     "plate_text": "HR03R8500",
+     "confidence": 0.238,
+     "offset_s": 1.24
+    },
+    {
+     "track_id": 19,
+     "plate_text": "CH01CJ5294",
+     "confidence": 0.665,
+     "offset_s": 1.37
+    },
+    {
+     "track_id": 24,
+     "plate_text": "AP20BP5866",
+     "confidence": 0.613,
+     "offset_s": 1.47
+    },
+    {
+     "track_id": 18,
+     "plate_text": "PB54H0510",
+     "confidence": 0.504,
+     "offset_s": 1.67
+    },
+    {
+     "track_id": 30,
+     "plate_text": "PB54H0997",
+     "confidence": 0.999,
+     "offset_s": 1.94
+    },
+    {
+     "track_id": 33,
+     "plate_text": "AP80A7947",
+     "confidence": 0.339,
+     "offset_s": 2.1
+    },
+    {
+     "track_id": 44,
+     "plate_text": "CH01CJ5294",
+     "confidence": 0.94,
+     "offset_s": 2.47
+    },
+    {
+     "track_id": 46,
+     "plate_text": "PB18BD8000",
+     "confidence": 0.763,
+     "offset_s": 2.47
+    },
+    {
+     "track_id": 41,
+     "plate_text": "HR03AE8034",
+     "confidence": 0.976,
+     "offset_s": 2.64
+    },
+    {
+     "track_id": 48,
+     "plate_text": "HR03AE8034",
+     "confidence": 0.993,
+     "offset_s": 2.8
+    },
+    {
+     "track_id": 49,
+     "plate_text": "AP01BT0001",
+     "confidence": 0.337,
+     "offset_s": 3.0
+    },
+    {
+     "track_id": 51,
+     "plate_text": "CH01C4111",
+     "confidence": 0.857,
+     "offset_s": 3.64
+    },
+    {
+     "track_id": 61,
+     "plate_text": "HR03AD5467",
+     "confidence": 0.945,
+     "offset_s": 3.7
+    },
+    {
+     "track_id": 70,
+     "plate_text": "HR03AD5467",
+     "confidence": 1.0,
+     "offset_s": 3.8
+    },
+    {
+     "track_id": 66,
+     "plate_text": "CH01CS6905",
+     "confidence": 0.948,
+     "offset_s": 4.2
+    },
+    {
+     "track_id": 60,
+     "plate_text": "CH01TA9525",
+     "confidence": 0.632,
+     "offset_s": 4.3
+    },
+    {
+     "track_id": 78,
+     "plate_text": "DN57T8055",
+     "confidence": 0.216,
+     "offset_s": 4.37
+    },
+    {
+     "track_id": 82,
+     "plate_text": "CH01CS6905",
+     "confidence": 1.0,
+     "offset_s": 4.84
+    },
+    {
+     "track_id": 80,
+     "plate_text": "PB54H0997",
+     "confidence": 0.774,
+     "offset_s": 4.91
+    },
+    {
+     "track_id": 83,
+     "plate_text": "CH01BQ5115",
+     "confidence": 0.877,
+     "offset_s": 5.24
+    },
+    {
+     "track_id": 88,
+     "plate_text": "PB54H0997",
+     "confidence": 0.611,
+     "offset_s": 5.77
+    },
+    {
+     "track_id": 95,
+     "plate_text": "AP99J0997",
+     "confidence": 0.792,
+     "offset_s": 5.91
+    },
+    {
+     "track_id": 97,
+     "plate_text": "PB54H0997",
+     "confidence": 0.999,
+     "offset_s": 6.07
+    },
+    {
+     "track_id": 90,
+     "plate_text": "CL12CA7991",
+     "confidence": 0.453,
+     "offset_s": 6.14
+    },
+    {
+     "track_id": 101,
+     "plate_text": "CH01RQ5115",
+     "confidence": 0.8,
+     "offset_s": 6.47
+    },
+    {
+     "track_id": 103,
+     "plate_text": "CH01BQ5115",
+     "confidence": 0.946,
+     "offset_s": 6.54
+    },
+    {
+     "track_id": 106,
+     "plate_text": "CH01BQ5115",
+     "confidence": 0.914,
+     "offset_s": 6.54
+    },
+    {
+     "track_id": 109,
+     "plate_text": "CH01BQ5115",
+     "confidence": 0.705,
+     "offset_s": 6.84
+    },
+    {
+     "track_id": 98,
+     "plate_text": "CH01CM3475",
+     "confidence": 0.98,
+     "offset_s": 7.07
+    },
+    {
+     "track_id": 112,
+     "plate_text": "CH01TA9526",
+     "confidence": 1.0,
+     "offset_s": 7.34
+    },
+    {
+     "track_id": 113,
+     "plate_text": "CH01TA9526",
+     "confidence": 0.999,
+     "offset_s": 7.47
+    },
+    {
+     "track_id": 114,
+     "plate_text": "CH01TA9526",
+     "confidence": 0.998,
+     "offset_s": 7.64
+    },
+    {
+     "track_id": 117,
+     "plate_text": "CH01T4950",
+     "confidence": 0.464,
+     "offset_s": 7.84
+    },
+    {
+     "track_id": 118,
+     "plate_text": "CH01T1113",
+     "confidence": 0.679,
+     "offset_s": 7.97
+    },
+    {
+     "track_id": 119,
+     "plate_text": "PB11BL4061",
+     "confidence": 0.94,
+     "offset_s": 8.01
+    },
+    {
+     "track_id": 137,
+     "plate_text": "AP01LC8169",
+     "confidence": 0.464,
+     "offset_s": 9.71
+    },
+    {
+     "track_id": 131,
+     "plate_text": "UP25CF5055",
+     "confidence": 0.992,
+     "offset_s": 9.91
+    },
+    {
+     "track_id": 138,
+     "plate_text": "CH01CH9193",
+     "confidence": 0.962,
+     "offset_s": 10.44
+    },
+    {
+     "track_id": 145,
+     "plate_text": "HR03Y9784",
+     "confidence": 0.886,
+     "offset_s": 11.78
+    },
+    {
+     "track_id": 142,
+     "plate_text": "GJ01CJ1011",
+     "confidence": 0.378,
+     "offset_s": 12.68
+    },
+    {
+     "track_id": 147,
+     "plate_text": "HP12L1772",
+     "confidence": 0.886,
+     "offset_s": 12.68
+    },
+    {
+     "track_id": 160,
+     "plate_text": "CH01TA9526",
+     "confidence": 0.998,
+     "offset_s": 13.21
+    },
+    {
+     "track_id": 167,
+     "plate_text": "CG01T4595",
+     "confidence": 0.641,
+     "offset_s": 13.55
+    },
+    {
+     "track_id": 164,
+     "plate_text": "AP10K5771",
+     "confidence": 0.411,
+     "offset_s": 13.75
+    },
+    {
+     "track_id": 172,
+     "plate_text": "AP07A2325",
+     "confidence": 0.565,
+     "offset_s": 13.78
+    },
+    {
+     "track_id": 176,
+     "plate_text": "AP39CA3914",
+     "confidence": 0.558,
+     "offset_s": 13.95
+    },
+    {
+     "track_id": 180,
+     "plate_text": "AP01CC8826",
+     "confidence": 0.334,
+     "offset_s": 14.18
+    },
+    {
+     "track_id": 185,
+     "plate_text": "AP49KG1916",
+     "confidence": 0.344,
+     "offset_s": 14.38
+    },
+    {
+     "track_id": 190,
+     "plate_text": "PP48HB1356",
+     "confidence": 0.428,
+     "offset_s": 15.02
+    },
+    {
+     "track_id": 177,
+     "plate_text": "PB10JR9976",
+     "confidence": 0.951,
+     "offset_s": 15.05
+    },
+    {
+     "track_id": 192,
+     "plate_text": "HP12L1772",
+     "confidence": 0.97,
+     "offset_s": 16.18
+    },
+    {
+     "track_id": 201,
+     "plate_text": "HR03Y9784",
+     "confidence": 0.812,
+     "offset_s": 17.12
+    },
+    {
+     "track_id": 204,
+     "plate_text": "CH01BB9805",
+     "confidence": 0.958,
+     "offset_s": 17.32
+    },
+    {
+     "track_id": 223,
+     "plate_text": "AP62J9805",
+     "confidence": 0.474,
+     "offset_s": 18.29
+    },
+    {
+     "track_id": 224,
+     "plate_text": "HR68C5153",
+     "confidence": 0.971,
+     "offset_s": 18.59
+    },
+    {
+     "track_id": 220,
+     "plate_text": "AP07BB9805",
+     "confidence": 0.674,
+     "offset_s": 19.05
+    },
+    {
+     "track_id": 238,
+     "plate_text": "CH01CR2218",
+     "confidence": 0.998,
+     "offset_s": 19.59
+    },
+    {
+     "track_id": 241,
+     "plate_text": "AP48HB1350",
+     "confidence": 0.399,
+     "offset_s": 19.65
+    },
+    {
+     "track_id": 246,
+     "plate_text": "CH01CR2218",
+     "confidence": 0.998,
+     "offset_s": 19.89
+    },
+    {
+     "track_id": 233,
+     "plate_text": "CH01TB7874",
+     "confidence": 0.81,
+     "offset_s": 19.92
+    },
+    {
+     "track_id": 245,
+     "plate_text": "HR03V0440",
+     "confidence": 0.991,
+     "offset_s": 20.02
+    },
+    {
+     "track_id": 248,
+     "plate_text": "AS20T8000",
+     "confidence": 0.602,
+     "offset_s": 20.02
+    },
+    {
+     "track_id": 257,
+     "plate_text": "HR03V0440",
+     "confidence": 1.0,
+     "offset_s": 20.39
+    },
+    {
+     "track_id": 262,
+     "plate_text": "HP12R7045",
+     "confidence": 0.69,
+     "offset_s": 20.45
+    },
+    {
+     "track_id": 267,
+     "plate_text": "CH01B7874",
+     "confidence": 0.987,
+     "offset_s": 20.59
+    },
+    {
+     "track_id": 259,
+     "plate_text": "HR40G4400",
+     "confidence": 0.345,
+     "offset_s": 20.69
+    },
+    {
+     "track_id": 287,
+     "plate_text": "HR03V0440",
+     "confidence": 1.0,
+     "offset_s": 21.05
+    },
+    {
+     "track_id": 285,
+     "plate_text": "HR40G4810",
+     "confidence": 0.315,
+     "offset_s": 21.15
+    },
+    {
+     "track_id": 289,
+     "plate_text": "HR03V0440",
+     "confidence": 1.0,
+     "offset_s": 21.15
+    },
+    {
+     "track_id": 296,
+     "plate_text": "KL07R1974",
+     "confidence": 0.408,
+     "offset_s": 21.45
+    },
+    {
+     "track_id": 297,
+     "plate_text": "AP41F1992",
+     "confidence": 0.359,
+     "offset_s": 21.45
+    },
+    {
+     "track_id": 301,
+     "plate_text": "TR26B5666",
+     "confidence": 0.517,
+     "offset_s": 21.86
+    },
+    {
+     "track_id": 307,
+     "plate_text": "CH01BQ7487",
+     "confidence": 0.937,
+     "offset_s": 22.76
+    },
+    {
+     "track_id": 317,
+     "plate_text": "HR40G4406",
+     "confidence": 0.538,
+     "offset_s": 22.82
+    },
+    {
+     "track_id": 316,
+     "plate_text": "CH01BQ7016",
+     "confidence": 0.943,
+     "offset_s": 22.89
+    },
+    {
+     "track_id": 314,
+     "plate_text": "HP12R7045",
+     "confidence": 0.675,
+     "offset_s": 22.96
+    },
+    {
+     "track_id": 328,
+     "plate_text": "HP12R7045",
+     "confidence": 0.983,
+     "offset_s": 23.62
+    },
+    {
+     "track_id": 325,
+     "plate_text": "HP12R7045",
+     "confidence": 0.536,
+     "offset_s": 23.82
+    },
+    {
+     "track_id": 323,
+     "plate_text": "AP01BJ1008",
+     "confidence": 0.331,
+     "offset_s": 23.96
+    },
+    {
+     "track_id": 336,
+     "plate_text": "HR40G7815",
+     "confidence": 0.822,
+     "offset_s": 24.26
+    },
+    {
+     "track_id": 333,
+     "plate_text": "HR38AE0782",
+     "confidence": 0.785,
+     "offset_s": 24.49
+    },
+    {
+     "track_id": 340,
+     "plate_text": "CH01BK7241",
+     "confidence": 0.793,
+     "offset_s": 24.62
+    },
+    {
+     "track_id": 343,
+     "plate_text": "CH01CZ3998",
+     "confidence": 0.994,
+     "offset_s": 24.62
+    },
+    {
+     "track_id": 347,
+     "plate_text": "HR38AE0782",
+     "confidence": 1.0,
+     "offset_s": 24.79
+    },
+    {
+     "track_id": 348,
+     "plate_text": "AP01BK6219",
+     "confidence": 0.458,
+     "offset_s": 24.82
+    },
+    {
+     "track_id": 349,
+     "plate_text": "HP12R7045",
+     "confidence": 1.0,
+     "offset_s": 24.89
+    },
+    {
+     "track_id": 352,
+     "plate_text": "HR31Q9221",
+     "confidence": 0.967,
+     "offset_s": 24.99
+    },
+    {
+     "track_id": 353,
+     "plate_text": "HP12R7045",
+     "confidence": 0.999,
+     "offset_s": 25.16
+    }
+   ]
+  },
+  {
+   "camera_id": "CAM_02",
+   "source_video": "14586488_3840_2160_60fps.mp4",
+   "reads": [
+    {
+     "track_id": 1,
+     "plate_text": "AP47C9407",
+     "confidence": 0.421,
+     "offset_s": 0.0
+    },
+    {
+     "track_id": 2,
+     "plate_text": "AP36D8354",
+     "confidence": 0.564,
+     "offset_s": 0.0
+    },
+    {
+     "track_id": 3,
+     "plate_text": "AP71D9407",
+     "confidence": 0.297,
+     "offset_s": 0.07
+    },
+    {
+     "track_id": 10,
+     "plate_text": "MP08CB3782",
+     "confidence": 0.628,
+     "offset_s": 2.52
+    },
+    {
+     "track_id": 26,
+     "plate_text": "MP08CB3782",
+     "confidence": 0.669,
+     "offset_s": 2.63
+    },
+    {
+     "track_id": 35,
+     "plate_text": "MP08CB3782",
+     "confidence": 0.917,
+     "offset_s": 2.68
+    },
+    {
+     "track_id": 44,
+     "plate_text": "AR01AB0558",
+     "confidence": 0.427,
+     "offset_s": 3.87
+    },
+    {
+     "track_id": 52,
+     "plate_text": "AP31AZ5844",
+     "confidence": 0.305,
+     "offset_s": 4.2
+    },
+    {
+     "track_id": 63,
+     "plate_text": "HR27BT8004",
+     "confidence": 0.329,
+     "offset_s": 5.0
+    },
+    {
+     "track_id": 82,
+     "plate_text": "TN21BY8958",
+     "confidence": 0.324,
+     "offset_s": 6.07
+    },
+    {
+     "track_id": 86,
+     "plate_text": "KL01BJ3001",
+     "confidence": 0.242,
+     "offset_s": 6.58
+    },
+    {
+     "track_id": 64,
+     "plate_text": "AP14RX4026",
+     "confidence": 0.69,
+     "offset_s": 7.4
+    },
+    {
+     "track_id": 87,
+     "plate_text": "MP04ZH5111",
+     "confidence": 0.855,
+     "offset_s": 8.37
+    },
+    {
+     "track_id": 115,
+     "plate_text": "OD14R7432",
+     "confidence": 0.951,
+     "offset_s": 9.48
+    },
+    {
+     "track_id": 116,
+     "plate_text": "AR01BT0588",
+     "confidence": 0.256,
+     "offset_s": 9.93
+    },
+    {
+     "track_id": 118,
+     "plate_text": "HP06CT4888",
+     "confidence": 0.617,
+     "offset_s": 10.02
+    },
+    {
+     "track_id": 119,
+     "plate_text": "AP21BC6854",
+     "confidence": 0.685,
+     "offset_s": 10.07
+    },
+    {
+     "track_id": 117,
+     "plate_text": "AP14K6166",
+     "confidence": 0.504,
+     "offset_s": 10.6
+    },
+    {
+     "track_id": 125,
+     "plate_text": "AP07AJ4588",
+     "confidence": 0.275,
+     "offset_s": 11.08
+    },
+    {
+     "track_id": 127,
+     "plate_text": "AP34VL2108",
+     "confidence": 0.458,
+     "offset_s": 11.13
+    },
+    {
+     "track_id": 129,
+     "plate_text": "MP04ZH5111",
+     "confidence": 0.999,
+     "offset_s": 11.33
+    },
+    {
+     "track_id": 130,
+     "plate_text": "AP48BL2198",
+     "confidence": 0.504,
+     "offset_s": 11.37
+    },
+    {
+     "track_id": 133,
+     "plate_text": "AP06A1683",
+     "confidence": 0.299,
+     "offset_s": 11.85
+    },
+    {
+     "track_id": 162,
+     "plate_text": "AP47R0711",
+     "confidence": 0.7,
+     "offset_s": 13.27
+    },
+    {
+     "track_id": 158,
+     "plate_text": "AP21AC8000",
+     "confidence": 0.42,
+     "offset_s": 13.35
+    }
+   ]
+  },
+  {
+   "camera_id": "CAM_03",
+   "source_video": "15076457_2160_3840_30fps.mp4",
+   "reads": [
+    {
+     "track_id": 1,
+     "plate_text": "KA41AA3211",
+     "confidence": 0.94,
+     "offset_s": 0.0
+    },
+    {
+     "track_id": 2,
+     "plate_text": "HP22AE8000",
+     "confidence": 0.802,
+     "offset_s": 0.23
+    },
+    {
+     "track_id": 3,
+     "plate_text": "KL42AE8228",
+     "confidence": 0.744,
+     "offset_s": 0.33
+    },
+    {
+     "track_id": 4,
+     "plate_text": "KA02AE0238",
+     "confidence": 0.715,
+     "offset_s": 0.37
+    },
+    {
+     "track_id": 5,
+     "plate_text": "UK06J3453",
+     "confidence": 0.723,
+     "offset_s": 0.63
+    },
+    {
+     "track_id": 7,
+     "plate_text": "AN21BT8008",
+     "confidence": 0.501,
+     "offset_s": 1.1
+    },
+    {
+     "track_id": 17,
+     "plate_text": "KA17S5975",
+     "confidence": 0.972,
+     "offset_s": 2.33
+    },
+    {
+     "track_id": 20,
+     "plate_text": "KA47S5953",
+     "confidence": 0.433,
+     "offset_s": 2.37
+    },
+    {
+     "track_id": 21,
+     "plate_text": "KA07A5655",
+     "confidence": 0.576,
+     "offset_s": 2.57
+    },
+    {
+     "track_id": 23,
+     "plate_text": "KA05AC5669",
+     "confidence": 0.713,
+     "offset_s": 2.77
+    },
+    {
+     "track_id": 27,
+     "plate_text": "KA07A0994",
+     "confidence": 0.35,
+     "offset_s": 3.53
+    },
+    {
+     "track_id": 29,
+     "plate_text": "KA07AT0994",
+     "confidence": 0.593,
+     "offset_s": 4.1
+    },
+    {
+     "track_id": 36,
+     "plate_text": "KA07AT2994",
+     "confidence": 0.929,
+     "offset_s": 4.47
+    },
+    {
+     "track_id": 43,
+     "plate_text": "KA05AC5663",
+     "confidence": 0.921,
+     "offset_s": 5.07
+    },
+    {
+     "track_id": 40,
+     "plate_text": "HS01AA0010",
+     "confidence": 0.279,
+     "offset_s": 5.73
+    },
+    {
+     "track_id": 48,
+     "plate_text": "KA02AJ1847",
+     "confidence": 0.874,
+     "offset_s": 5.87
+    },
+    {
+     "track_id": 51,
+     "plate_text": "KA02AJ1827",
+     "confidence": 0.909,
+     "offset_s": 6.07
+    }
+   ]
+  }
+ ]
+}
