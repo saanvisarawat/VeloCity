@@ -7,6 +7,7 @@ services:
       POSTGRES_USER: ps127_admin
       POSTGRES_PASSWORD: ps127_password
       POSTGRES_DB: ps127_db
+   
     ports:
       - "5432:5432"
     volumes:
@@ -26,6 +27,7 @@ services:
       - ./app:/app
     environment:
       - DATABASE_URL=postgresql://ps127_admin:ps127_password@db:5432/ps127_db
+      - LIVE_TRAFFIC_API_KEY=${LIVE_TRAFFIC_API_KEY}
     depends_on:
       - db
       - redis
