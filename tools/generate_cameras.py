@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 """Generate 25 realistic urban ANPR camera nodes for a Bengaluru grid.
 
 Writes data/cameras.json using the Eetal camera schema:
@@ -14,21 +14,21 @@ import json
 import math
 from pathlib import Path
 
-# Earth radius (km) for haversine / bbox area checks.
+
 EARTH_R_KM = 6371.0
 
-# Central Bengaluru (~Cubbon Park).
+
 CITY = "Bengaluru"
 ORIGIN_LAT = 12.9716
 ORIGIN_LON = 77.5946
 
-# Target coverage: ~3.9 km × 3.9 km ≈ 15 km².
+
 TARGET_AREA_KM2 = 15.0
 
 OUTPUT_PATH = Path(__file__).resolve().parent.parent / "data" / "cameras.json"
 
-# Named junctions with (lat, lon) inside the central urban grid.
-# Coordinates are realistic public-road locations, not random jitter.
+
+
 JUNCTIONS: list[dict] = [
     {
         "id": "cam_001",
@@ -267,7 +267,7 @@ SCHEMA_KEYS = (
     "speed_limit_kmh",
 )
 
-# Loose WGS84 bounds for the Bengaluru urban core used here.
+
 BLR_LAT_RANGE = (12.90, 13.05)
 BLR_LON_RANGE = (77.50, 77.70)
 
@@ -323,7 +323,7 @@ def validate(cameras: list[dict]) -> None:
             raise TypeError(f"speed_limit_kmh must be a positive float: {cam['id']}")
 
     area, width, height = bbox_area_km2(cameras)
-    # Allow a modest band around the ~15 km² urban grid.
+
     if not (8.0 <= area <= 25.0):
         raise ValueError(
             f"Camera bbox area {area:.2f} km² ( {width:.2f}×{height:.2f} km ) "

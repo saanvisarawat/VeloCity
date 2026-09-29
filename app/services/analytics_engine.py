@@ -15,13 +15,13 @@ async def compute_density(conn, window_minutes: int = 15):
         WHERE frame_ts >= NOW() - $1::interval
         GROUP BY camera_id;
     """
-    # asyncpg encodes an `interval` parameter from a Python timedelta, not a string
+
     records = await conn.fetch(query, timedelta(minutes=window_minutes))
     return [dict(r) for r in records]
 
 async def compute_od_matrix(conn, hour: int = None, date_str: str = None):
     """Finds vehicle trajectories between Camera A and Camera B."""
-    # This simplified query finds the first and last camera seen for each vehicle track today
+
     query = """
         WITH trip_ends AS (
             SELECT track_id, 
@@ -116,8 +116,8 @@ async def compute_summary(conn):
         WHERE frame_ts >= CURRENT_DATE - INTERVAL '1 day' AND frame_ts < CURRENT_DATE;
     """)
 
-    # Average speed across consecutive camera-to-camera hops today, using PostGIS
-    # sphere distance between camera geoms and the elapsed time between reads.
+
+
     avg_speed = await conn.fetchval("""
         WITH ordered AS (
             SELECT track_id, camera_id, frame_ts,
@@ -206,7 +206,7 @@ async def compute_bottlenecks(conn, window_minutes: int = 60, threshold_factor: 
         expected = baseline.get(r['segment'])
         if expected is None:
             continue
-        # Flag if current transit time exceeds baseline by >= threshold_factor (1.5x)
+
         if r['current_sec'] >= (expected * threshold_factor):
             bottlenecks.append({
                 "segment": r['segment'],
@@ -258,7 +258,7 @@ async def compute_timeseries(conn, window_minutes: int = 120, bucket_minutes: in
     speed_by_bucket = {r['bucket']: r['avg_speed_kmh'] for r in speed_rows}
     counts_by_bucket = {r['bucket']: r['vehicle_count'] for r in count_rows}
 
-    # Fill every bucket in the window (even empty ones) so the chart has no gaps.
+
     now = datetime.now(timezone.utc)
     num_buckets = max(window_minutes // bucket_minutes, 1)
     start = now - timedelta(minutes=window_minutes)

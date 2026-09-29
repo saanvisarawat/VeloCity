@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 """Generate synthetic ANPR reads across the Bengaluru camera grid.
 
 Writes data/synthetic_reads.json using the Eetal raw_reads schema:
@@ -49,7 +49,7 @@ STATE_CODES = [
     "HR", "PB", "KL", "MP", "CG", "BR", "OR", "UK", "HP", "GA",
 ]
 
-# Spec OCR confusion: 8<->B, 0<->D/O, 1<->I, 5<->S, Z<->2
+
 OCR_CONFUSION: dict[str, tuple[str, ...]] = {
     "8": ("B",),
     "B": ("8",),
@@ -191,7 +191,7 @@ def apply_ocr(plate: str, rng: random.Random) -> tuple[str, bool]:
 
 
 def iso8601(ts: datetime) -> str:
-    # Preserve IST offset; drop microseconds that are exactly 0 for compactness.
+
     return ts.isoformat(timespec="milliseconds")
 
 

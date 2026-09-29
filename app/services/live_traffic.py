@@ -29,7 +29,7 @@ TILE_URL = "https://api.tomtom.com/traffic/map/4/tile/flow/relative/{z}/{x}/{y}.
 CACHE_TTL_SECONDS = 20 * 60
 MAX_CONGESTION = 0.6  # a road running 60%+ below free-flow speed counts as fully congested (intensity 1.0)
 
-# (name, lat, lon): the six camera sites first, then major junctions spread across the city.
+
 SAMPLE_POINTS = [
     ("Connaught Place", 28.6315, 77.2167),
     ("India Gate", 28.6129, 77.2295),
@@ -78,8 +78,8 @@ async def _fetch_point(client: httpx.AsyncClient, sem: asyncio.Semaphore, name: 
         return None, None
 
     closure = bool(seg.get("roadClosure"))
-    # A closure flag alone doesn't mean a standstill (partial/lane closures still report moving traffic),
-    # so only a zero current speed on a closed segment counts as fully blocked.
+
+
     if closure and current == 0:
         congestion = 1.0
     elif free_flow > 0:
@@ -128,7 +128,7 @@ async def get_live_traffic() -> dict:
                 _cache["points"], _cache["fetched_at"] = points, time.time()
             elif _cache["points"] is None:
                 return {"available": False, "reason": "upstream_error", "points": []}
-            # else: refresh failed (quota / outage) -- keep serving the last good data, flagged stale below
+
 
         age = time.time() - _cache["fetched_at"]
         return {

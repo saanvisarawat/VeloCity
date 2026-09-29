@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 """Seed 7 days of urban traffic baseline metrics for analytics_cache.
 
 Writes data/historical_analytics_baseline.json:
@@ -25,7 +25,7 @@ CAMERAS_PATH = ROOT / "data" / "cameras.json"
 OUTPUT_PATH = ROOT / "data" / "historical_analytics_baseline.json"
 
 IST = timezone(timedelta(hours=5, minutes=30))
-# Seven calendar days immediately before the synthetic-reads sim day.
+
 START_DAY = datetime(2026, 9, 17, 0, 0, 0, tzinfo=IST)
 DAYS = 7
 BUCKET_MINUTES = 30
@@ -122,9 +122,9 @@ def demand_factor(ts: datetime) -> float:
     def peak(center: float, half_width: float, amplitude: float) -> float:
         return amplitude * math.exp(-0.5 * ((minutes - center) / half_width) ** 2)
 
-    # Late-night floor, then additive Gaussian peaks.
+
     base = 0.10
-    # Overnight 00:00–05:00 stays near the floor.
+
     if 0 <= minutes < 5 * 60:
         base = 0.08
     morning = peak(9 * 60 + 15, 70, 1.05)  # 08:00–10:30, centre ~09:15
@@ -153,7 +153,7 @@ def congestion_multiplier(ts: datetime, inbound_cbd: bool) -> float:
         directional = 0.94
     if is_weekend(ts):
         directional = 0.5 * directional + 0.5
-    # Map demand 0.08→~1.02x, rush ~1.8–2.3x.
+
     return 1.02 + 1.15 * (demand ** 1.4) * directional
 
 
@@ -175,13 +175,13 @@ def generate_records(cameras: list[dict], rng: random.Random) -> list[dict]:
     for cam in cameras:
         lanes = int(cam["lane_count"])
         limit = float(cam["speed_limit_kmh"])
-        # Arterial cameras (more lanes / higher limit) carry more baseline flow.
+
         base_count = 18.0 * lanes * (0.75 + 0.25 * (limit / 50.0))
         for ts in buckets:
             demand = demand_factor(ts)
             noise = rng.uniform(0.88, 1.12)
             count = max(0, int(round(base_count * demand * noise * (BUCKET_MINUTES / 15.0))))
-            # Speed drops as demand rises; night traffic is closer to the posted limit.
+
             speed = limit * (0.42 + 0.50 * (1.0 - min(1.0, demand)))
             speed = max(12.0, min(limit, speed * rng.uniform(0.94, 1.06)))
             occupancy = min(92.0, 8.0 + 62.0 * demand * rng.uniform(0.92, 1.08))

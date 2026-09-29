@@ -11,3 +11,5 @@ numpy
 joblib
 httpx
 python-multipart
+networkx
+osmnx

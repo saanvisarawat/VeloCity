@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 """
 Replays real ANPR-pipeline output (plates read from the recorded demo footage) into the running backend
 through the normal ingestion route, so the dashboard, trajectories and alert rules run on genuine model

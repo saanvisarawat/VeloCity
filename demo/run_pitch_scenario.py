@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 """
 Deliverable 6: Pitch Presentation Orchestrator.
 Simulates live background traffic, registers an alert on a blacklisted plate,
@@ -63,7 +63,7 @@ def stage_2_register_blacklist(base_url: str) -> None:
 def stage_3_sequential_intercept(base_url: str, delay_sec: float = 3.0) -> None:
     print(f"\n\033[1;33m[STAGE 3] Injecting sequential target hops for tracking and alerts...\033[0m")
     
-    # Reverted to lowercase to match the seeded PostGIS database
+
     demo_hops = [
         {"camera_id": "cam_001", "track_id": 9901, "confidence": 0.98},
         {"camera_id": "cam_004", "track_id": 9902, "confidence": 0.96},

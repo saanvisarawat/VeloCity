@@ -25,8 +25,8 @@ import asyncio
 
 app = FastAPI(title="VeloCity API")
 
-# Dev-only: the frontend (Vite on :5173) is a different origin than the API (:8000).
-# No cookies/credentials are used, so a wide-open dev policy is safe here.
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -36,11 +36,11 @@ app.add_middleware(
 
 DB_URL = os.getenv("DATABASE_URL", "postgresql://ps127_admin:ps127_password@localhost:5432/ps127_db")
 
-# ML inference service (ml/serve/app.py) -- currently a free Colab GPU session behind a static ngrok
-# domain (see ml/docs/RESUME_HERE.md DEPLOYMENT STATUS). Not always running: it needs the Colab tab
-# kept open. Set these two env vars to point at whatever's live; every /api/v1/ml/* route below fails
-# with a clean 503 (not a crash) if they're unset or the service is unreachable, so the frontend's
-# built-in pre-recorded demo still works even when the live service is down.
+
+
+
+
+
 ML_SERVICE_URL = os.getenv("ML_SERVICE_URL", "").rstrip("/")
 ML_SERVICE_API_KEY = os.getenv("ML_SERVICE_API_KEY", "")
 ML_SERVICE_TIMEOUT = httpx.Timeout(600.0, connect=15.0)  # video processing can take minutes on a free GPU
@@ -50,7 +50,7 @@ async def launch_background_refreshers():
     asyncio.create_task(start_background_refresh())
     asyncio.create_task(live_traffic_recorder())
 
-# --- WEBSOCKET MANAGER ---
+
 class ConnectionManager:
     def __init__(self):
         self.active_connections: list[WebSocket] = []
@@ -69,19 +69,19 @@ class ConnectionManager:
             try:
                 await connection.send_json(message)
             except RuntimeError:
-                # Client disconnected abruptly
+
                 dead_connections.append(connection)
             except Exception as e:
                 print(f"WebSocket broadcast error: {e}")
                 dead_connections.append(connection)
                 
-        # Clean up dead connections so they don't block future alerts
+
         for dead in dead_connections:
             self.disconnect(dead)
 
 manager = ConnectionManager()
 
-# --- PYDANTIC MODELS ---
+
 class ReadIngest(BaseModel):
     camera_id: str
     track_id: int
@@ -95,17 +95,17 @@ class BlacklistEntry(BaseModel):
     reason: str
     severity: str = "HIGH"
 
-# --- CORE INGESTION, DEDUPLICATION & ALERTS ---
+
 async def _ingest_read(read: ReadIngest):
     conn = await asyncpg.connect(DB_URL)
     try:
-        # 1. Insert the raw read
+
         await conn.execute("""
             INSERT INTO raw_reads (camera_id, track_id, plate_text, confidence, frame_ts, image_ref)
             VALUES ($1, $2, $3, $4, $5, $6)
         """, read.camera_id, read.track_id, read.plate_text, read.confidence, read.frame_ts, read.image_ref)
 
-        # 2. Deduplication / Upsert into vehicle_tracks (5-second threshold)
+
         await conn.execute("""
             INSERT INTO vehicle_tracks (track_id, camera_id, first_seen, last_seen, plate_text_final, confidence_avg)
             VALUES ($1, $2, $3, $3, $4, $5)
@@ -116,7 +116,7 @@ async def _ingest_read(read: ReadIngest):
             WHERE EXTRACT(EPOCH FROM (EXCLUDED.last_seen - vehicle_tracks.last_seen)) < 5;
         """, read.track_id, read.camera_id, read.frame_ts, read.plate_text, read.confidence)
         
-        # 3. Real-Time Alert Engine Trigger
+
         alert_payload = await check_read_anomalies(
             read.plate_text, 
             read.camera_id, 
@@ -126,14 +126,14 @@ async def _ingest_read(read: ReadIngest):
         if alert_payload:
             severity = SEVERITY_BY_RULE.get(alert_payload["rule"], "MEDIUM")
 
-            # Write an entry to alerts table
+
             alert_id = await conn.fetchval("""
                 INSERT INTO alerts (plate_text, camera_id, type, confidence, severity, status, acknowledged, explanation, ts)
                 VALUES ($1, $2, $3, $4, $5, 'NEW', FALSE, $6, $7)
                 RETURNING id
             """, read.plate_text, read.camera_id, alert_payload["rule"], alert_payload["confidence"], severity, json.dumps(alert_payload), read.frame_ts)
 
-            # Immediately broadcast the payload to all connected clients
+
             await manager.broadcast({
                 "id": alert_id,
                 "type": alert_payload["rule"],
@@ -155,7 +155,7 @@ async def _ingest_read(read: ReadIngest):
 async def ingest_read(read: ReadIngest):
     return await _ingest_read(read)
 
-# --- TRAJECTORY RECONSTRUCTION ENGINE ---
+
 @app.get("/api/v1/trajectory/{plate}")
 async def get_trajectory(plate: str, from_ts: str = None, to_ts: str = None):
     conn = await asyncpg.connect(DB_URL)
@@ -164,7 +164,7 @@ async def get_trajectory(plate: str, from_ts: str = None, to_ts: str = None):
     finally:
         await conn.close()
 
-# --- ALERTS WEBSOCKET ---
+
 @app.websocket("/ws/alerts")
 async def websocket_alerts(websocket: WebSocket):
     await manager.connect(websocket)
@@ -175,7 +175,7 @@ async def websocket_alerts(websocket: WebSocket):
     except WebSocketDisconnect:
         manager.disconnect(websocket)
 
-# --- MACRO TRAFFIC ANALYTICS ENGINE (Module D) ---
+
 @app.get("/api/v1/analytics/density")
 async def get_density(window_minutes: int = 15):
     conn = await asyncpg.connect(DB_URL)
@@ -213,7 +213,7 @@ async def live_traffic_tile(z: int, x: int, y: int):
         return Response(status_code=204)
     return Response(content=tile, media_type="image/png", headers={"Cache-Control": "public, max-age=120"})
 
-# --- LIVE TRAFFIC HISTORY (city-wide speed/congestion snapshots for the dashboard trend chart) ---
+
 LIVE_HISTORY_DDL = """
     CREATE TABLE IF NOT EXISTS live_traffic_history (
         ts TIMESTAMPTZ PRIMARY KEY,
@@ -330,7 +330,7 @@ async def get_bottlenecks(window_minutes: int = 60, threshold_factor: float = 1.
     finally:
         await conn.close()
 
-# --- CAMERAS & KPI SUMMARY ---
+
 @app.get("/api/v1/cameras")
 async def get_cameras():
     conn = await asyncpg.connect(DB_URL)
@@ -357,15 +357,15 @@ async def get_timeseries(window_minutes: int = 120, bucket_minutes: int = 10):
 
 @app.get("/api/v1/external/delhi-vehicle-stats")
 async def get_delhi_vehicle_stats():
-    # Static reference snapshot (not a live external call) — see services/external_reference.py
+
     return get_delhi_vehicle_reference_stats()
 
 @app.get("/api/v1/external/delhi-vehicle-fleet-trend")
 async def get_delhi_vehicle_fleet_trend_endpoint():
-    # Separate dataset/source from the snapshot above — see the module docstring
-    # in services/external_reference.py for why these aren't merged.
-    # Always serves from an in-memory cache kept warm by a background task
-    # (services/delhi_fleet_fetcher.py) — never blocks on the upstream site.
+
+
+
+
     return get_cached_fleet_data()
 
 @app.get("/api/v1/cameras/{camera_id}/recent-reads")
@@ -376,7 +376,7 @@ async def get_camera_recent_reads(camera_id: str, limit: int = 8):
     finally:
         await conn.close()
 
-# --- ALERTS ---
+
 @app.get("/api/v1/alerts")
 async def get_alerts(limit: int = 10, unacknowledged_only: bool = True):
     conn = await asyncpg.connect(DB_URL)
@@ -430,7 +430,7 @@ async def _set_alert_status(alert_id: int, status: str, acknowledged: bool):
     finally:
         await conn.close()
 
-# --- BLACKLIST MANAGEMENT ---
+
 @app.get("/api/v1/blacklist")
 async def list_blacklist():
     conn = await asyncpg.connect(DB_URL)
@@ -449,7 +449,7 @@ async def add_blacklist(entry: BlacklistEntry):
             VALUES ($1, $2, $3)
             ON CONFLICT (plate_text) DO UPDATE SET reason = EXCLUDED.reason, severity = EXCLUDED.severity;
         """, entry.plate_text, entry.reason, entry.severity)
-        # Keep the alert engine's Redis cache in sync so the next read triggers a live alert
+
         await redis_client.sadd("blacklist_exact", entry.plate_text)
         return {"status": "added", "plate": entry.plate_text}
     finally:
@@ -459,15 +459,15 @@ async def add_blacklist(entry: BlacklistEntry):
 async def upload_traffic_video(
     video: UploadFile = File(...),
     camera_id: str = Form("demo01")
-    # Line 314 removed: 'conn = Depends(get_db)' is deleted to fix the Pylance error
+
 ):
-    # 1. Run video through the remote ML model
+
     extracted_reads = await process_video_via_ml(video, camera_id)
     
-    # 2. Ingest reads into PostGIS & trigger alerts
+
     ingested_count = 0
     for read in extracted_reads:
-        # Re-use the existing ReadIngest model (line 61) and ingest_read function (line 71)
+
         read_obj = ReadIngest(
             camera_id=read["camera_id"],
             track_id=read["track_id"],
@@ -476,7 +476,7 @@ async def upload_traffic_video(
             frame_ts=read["frame_ts"],
             image_ref=read["image_ref"]
         )
-        # This replaces evaluate_alerts and handles DB connections, deduplication, and WebSocket broadcasts automatically
+
         await ingest_read(read_obj) 
         ingested_count += 1
         
@@ -499,13 +499,13 @@ async def delete_blacklist(plate: str):
     finally:
         await conn.close()
 
-# --- ML INFERENCE PROXY (Module A/B live demo -- "Test the Model" screen) ---
-# Thin forwarders to the ml/ service's own /health, /process-video, /process-image (see
-# ml/serve/app.py). Kept as a proxy rather than having the frontend call the ML service directly so
-# the ngrok/Colab URL and its API key live in one place (this backend's env vars), not in frontend
-# code, and so the frontend only ever needs to know about this one backend origin.
+
+
+
+
+
 ML_UPLOAD_MAX_BYTES = 150 * 1024 * 1024  # 150MB -- generous for a demo clip, kept below the ml
-                                          # service's own 500MB cap to protect this backend's memory
+
 
 
 def _require_ml_service() -> None:

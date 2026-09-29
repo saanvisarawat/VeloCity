@@ -18,7 +18,7 @@ async def process_video_via_ml(video_file: UploadFile, camera_id: str = "demo01"
             response.raise_for_status()
             ml_data = response.json()
             
-            # Convert clip-relative frame_ts to absolute wall-clock UTC time
+
             current_time = datetime.datetime.now(datetime.timezone.utc)
             
             clean_reads = []

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 """Standalone OSM road-snap / routing evaluation between two camera nodes.
 
 Primary: public OSRM driving route (snaps coordinates onto the OSM graph).
@@ -22,16 +22,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CAMERAS_PATH = ROOT / "data" / "cameras.json"
 
-# Public OSRM demo server (OSM-backed). Not for production load.
+
 OSRM_BASE = "https://router.project-osrm.org/route/v1/driving"
 OSRM_TIMEOUT_S = 20
 
 EARTH_R_KM = 6371.0
-# Used only for the local interpolation fallback duration estimate.
+
 FALLBACK_SPEED_KMH = 35.0
 INTERP_POINTS = 24
 
-# Two cameras on opposite sides of the central Bengaluru grid.
+
 DEFAULT_ORIGIN = "cam_019"  # Race Course Road / Chalukya Circle
 DEFAULT_DEST = "cam_012"  # Halasuru Metro / Old Madras Road
 

@@ -71,6 +71,6 @@ DELHI_VEHICLE_FLEET_TREND = [
     {"fiscal_year": "2024-25", "cars_and_jeeps": 2088805, "motorcycles_scooters": 5659930, "auto_rickshaws": 94731, "taxis": 84632, "buses": 17613, "e_rickshaws_other": 173457, "ambulances": 1136, "tractors_goods_others": 293340, "total_vehicles_plying": 8413644},
 ]
 
-# The live-refreshing getter lives in delhi_fleet_fetcher.py (get_cached_fleet_data),
-# which seeds its cache from DELHI_VEHICLE_FLEET_TREND above and keeps it fresh via
-# a scheduled background re-fetch of the OpenCity CSV.
+
+
+

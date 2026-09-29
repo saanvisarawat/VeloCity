@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 """Train an IsolationForest on synthetic urban trip profiles.
 
 Features: [start_hour, duration_min, distance_km, avg_speed]
@@ -44,7 +44,7 @@ def synthesize_trips(n: int = N_SAMPLES, rng: np.random.Generator | None = None)
 
 
 def _normal_trips(n: int, rng: np.random.Generator) -> np.ndarray:
-    # Mixture of start hours: morning rush, daytime, evening rush, night.
+
     buckets = rng.choice(
         np.array([0, 1, 2, 3], dtype=int),
         size=n,
@@ -61,7 +61,7 @@ def _normal_trips(n: int, rng: np.random.Generator) -> np.ndarray:
     start_hour[night] = rng.uniform(0.0, 24.0, size=int(night.sum()))
     start_hour = np.mod(start_hour, 24.0)
 
-    # Distances on the ~15 km² central grid, with a longer tail.
+
     distance_km = np.clip(rng.lognormal(mean=0.85, sigma=0.55, size=n), 0.4, 14.0)
 
     rush = ((start_hour >= 8.0) & (start_hour < 10.5)) | ((start_hour >= 17.5) & (start_hour < 20.5))
@@ -69,7 +69,7 @@ def _normal_trips(n: int, rng: np.random.Generator) -> np.ndarray:
     avg_speed[rush] = rng.uniform(18.0, 38.0, size=int(rush.sum()))
     avg_speed[~rush] = rng.uniform(28.0, 52.0, size=int((~rush).sum()))
 
-    # Duration from physics plus modest signal / dwell jitter.
+
     duration_min = (distance_km / avg_speed) * 60.0 * rng.uniform(0.92, 1.28, size=n)
     duration_min = np.clip(duration_min, 1.5, 75.0)
     avg_speed = distance_km / (duration_min / 60.0)
@@ -84,19 +84,19 @@ def _anomalous_trips(n: int, rng: np.random.Generator) -> np.ndarray:
     rows = np.empty((n, 4), dtype=np.float64)
     for i, k in enumerate(kind):
         if k == 0:
-            # Teleport / excessive speed.
+
             start_hour = float(rng.uniform(0.0, 24.0))
             distance_km = float(rng.uniform(6.0, 18.0))
             duration_min = float(rng.uniform(0.4, 2.5))
             avg_speed = distance_km / (duration_min / 60.0)
         elif k == 1:
-            # Abnormal dwell on a short hop.
+
             start_hour = float(rng.uniform(0.0, 24.0))
             distance_km = float(rng.uniform(0.3, 1.8))
             duration_min = float(rng.uniform(90.0, 240.0))
             avg_speed = distance_km / (duration_min / 60.0)
         else:
-            # Odd hours with contradictory long/slow or reverse-commute spike.
+
             start_hour = float(rng.choice([1.0, 2.0, 3.0, 4.0]))
             distance_km = float(rng.uniform(10.0, 22.0))
             avg_speed = float(rng.uniform(3.0, 8.0))

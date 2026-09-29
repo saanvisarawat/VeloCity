@@ -21,11 +21,11 @@ import os
 import redis.asyncio as redis
 
 DB_URL = os.getenv("DATABASE_URL", "postgresql://ps127_admin:ps127_password@localhost:5432/ps127_db")
-# Matches alert_engine.py's default: the docker-compose service name, not "localhost".
+
 REDIS_HOST = os.getenv("REDIS_HOST", "redis")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 
-# (plate, reason, severity, rto_zone) — reason text is illustrative/fictional only.
+
 DEMO_BLACKLIST = [
     ("DL01CX7743", "Reported stolen — FIR #0442/2025, Kotwali PS (North Delhi)", "HIGH"),
     ("DL02BQ1190", "Suspended registration — pollution compliance pending", "MEDIUM"),
@@ -51,8 +51,8 @@ async def seed():
                 VALUES ($1, $2, $3)
                 ON CONFLICT (plate_text) DO UPDATE SET reason = EXCLUDED.reason, severity = EXCLUDED.severity;
             """, plate, reason, severity)
-            # Mirror what POST /api/v1/blacklist does, so these entries trigger
-            # real-time alerts if a matching plate is read.
+
+
             await r.sadd("blacklist_exact", plate)
             print(f"  {plate} [{severity}] — {reason}")
         print("Done.")

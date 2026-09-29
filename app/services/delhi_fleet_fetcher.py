@@ -47,8 +47,8 @@ ROW_KEY_MAP = {
 }
 REQUIRED_KEYS = {"cars_and_jeeps", "motorcycles_scooters", "total_vehicles_plying"}
 
-# In-memory cache. Seeded with the verified static snapshot so the endpoint
-# always has something sane to return, even before the first fetch completes.
+
+
 _cache = {
     "years": DELHI_VEHICLE_FLEET_TREND,
     "source": DELHI_VEHICLE_FLEET_TREND_SOURCE["name"],
@@ -101,8 +101,8 @@ def _parse_csv(text):
         if total is not None and not (1_000_000 <= total <= 50_000_000):
             raise ValueError(f"Sanity check failed: total_vehicles_plying={total} for {entry['fiscal_year']} out of plausible range")
 
-    # Drop years where we couldn't even parse a total (keeps output clean if a
-    # trailing/leading column is a footnote or blank in some future revision).
+
+
     return [e for e in by_year if e.get("total_vehicles_plying") is not None]
 
 async def refresh_fleet_data():
@@ -119,7 +119,7 @@ async def refresh_fleet_data():
         _cache["is_live"] = True
         print(f"[delhi_fleet_fetcher] Refreshed {len(parsed)} years from OpenCity CSV.")
     except Exception as e:
-        # Keep serving whatever was cached before (static seed or last good fetch).
+
         print(f"[delhi_fleet_fetcher] Refresh failed, keeping cached data: {e}")
 
 async def start_background_refresh():

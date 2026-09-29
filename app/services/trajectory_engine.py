@@ -2,7 +2,7 @@ import httpx
 import json
 from datetime import datetime
 
-# Substitution penalty matrix for Indian license plates
+
 OCR_CONFUSION_PAIRS = {
     '8': 'B', 'B': '8',
     '0': 'D', 'D': '0', '0': 'O', 'O': '0',
@@ -14,7 +14,7 @@ OCR_CONFUSION_PAIRS = {
 async def build_trajectory(conn, target_plate: str):
     await conn.execute("CREATE EXTENSION IF NOT EXISTS pg_trgm;")
     
-    # Offload fuzzy matching, speed plausibility (140km/h), and GeoJSON generation to PostGIS
+
     query = """
         WITH matched_reads AS (
             SELECT r.plate_text, r.confidence, r.frame_ts, r.image_ref, 
@@ -69,7 +69,7 @@ async def build_trajectory(conn, target_plate: str):
     features = json.loads(row['waypoint_features'])
     coords_list = json.loads(row['raw_coords'])
     
-    # 3. Road Snapping via OSRM HTTP API
+
     if len(coords_list) > 1:
         coords_string = ";".join([f"{c['lon']},{c['lat']}" for c in coords_list])
         osrm_url = f"http://router.project-osrm.org/route/v1/driving/{coords_string}?geometries=geojson&overview=full"
@@ -90,7 +90,7 @@ async def build_trajectory(conn, target_plate: str):
             except Exception as e:
                 print(f"OSRM routing failed: {e}")
         
-        # Bypassing Python-side geometric serialization per the Day 2.5 blueprint
+
         db_fallback = json.loads(row['db_fallback_geojson']) if row['db_fallback_geojson'] else None
         if db_fallback:
             features.append({
